@@ -1,0 +1,53 @@
+mysql_master:
+  image: tutum/mysql:5.6
+  environment:
+    MYSQL_USER: 'admin' # default
+    MYSQL_PASS: 'mypass'
+    REPLICATION_MASTER: 'true'
+    REPLICATION_USER: 'replica' # default
+    REPLICATION_PASS: 'replica' # default
+  ports:
+    - '3306:3306'
+
+mysql_slave_1:
+  image: tutum/mysql:5.6
+  environment:
+    MYSQL_PASS: 'mypass'
+    REPLICATION_SLAVE: 'true'
+  ports:
+    - '3307:3306'
+  links:
+    - mysql_master:mysql
+
+mysql_slave_2:
+  image: tutum/mysql:5.6
+  environment:
+    MYSQL_PASS: 'mypass'
+    REPLICATION_SLAVE: 'true'
+  ports:
+    - '3308:3306'
+  links:
+    - mysql_master:mysql
+
+mysql_slave_3:
+  image: tutum/mysql:5.6
+  environment:
+    MYSQL_PASS: 'mypass'
+    REPLICATION_SLAVE: 'true'
+  ports:
+    - '3309:3306'
+  links:
+    - mysql_master:mysql
+
+mysql_router:
+  image: ecylmz/mysql-router
+  environment:
+    REPLICATION: 'true'
+  ports:
+    - '7001:7001'
+    - '7002:7002'
+  links:
+    - mysql_master
+    - mysql_slave_1
+    - mysql_slave_2
+    - mysql_slave_3
